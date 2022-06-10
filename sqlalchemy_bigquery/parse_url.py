@@ -69,6 +69,7 @@ def parse_url(url):  # noqa: C901
     arraysize = None
     credentials_path = None
     credentials_base64 = None
+    credentials_user_info_json = None
     list_tables_page_size = None
 
     # location
@@ -82,6 +83,9 @@ def parse_url(url):  # noqa: C901
     # credentials_base64
     if "credentials_base64" in query:
         credentials_base64 = query.pop("credentials_base64")
+
+    if "credentials_user_info_json" in query:
+        credentials_user_info_json = query.pop("credentials_user_info_json")
 
     # arraysize
     if "arraysize" in query:
@@ -115,6 +119,7 @@ def parse_url(url):  # noqa: C901
                 credentials_base64,
                 QueryJobConfig(),
                 list_tables_page_size,
+                credentials_user_info_json,
             )
         else:
             return (
@@ -126,6 +131,7 @@ def parse_url(url):  # noqa: C901
                 credentials_base64,
                 None,
                 list_tables_page_size,
+                credentials_user_info_json,
             )
 
     job_config = QueryJobConfig()

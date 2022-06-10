@@ -10,6 +10,7 @@ import re
 from google.api_core import client_info
 import google.auth
 from google.cloud import bigquery
+from google.oauth2 import credentials
 from google.oauth2 import service_account
 import sqlalchemy
 import base64
@@ -33,6 +34,7 @@ def create_bigquery_client(
     credentials_info=None,
     credentials_path=None,
     credentials_base64=None,
+    credentials_user_info_json=None,
     default_query_job_config=None,
     location=None,
     project_id=None,
@@ -43,19 +45,22 @@ def create_bigquery_client(
         credentials_info = json.loads(base64.b64decode(credentials_base64))
 
     if credentials_path:
-        credentials = service_account.Credentials.from_service_account_file(
+        bq_credentials = service_account.Credentials.from_service_account_file(
             credentials_path
         )
-        credentials = credentials.with_scopes(SCOPES)
-        default_project = credentials.project_id
+        bq_credentials = bq_credentials.with_scopes(SCOPES)
+        default_project = bq_credentials.project_id
     elif credentials_info:
-        credentials = service_account.Credentials.from_service_account_info(
+        bq_credentials = service_account.Credentials.from_service_account_info(
             credentials_info
         )
-        credentials = credentials.with_scopes(SCOPES)
-        default_project = credentials.project_id
+        bq_credentials = bq_credentials.with_scopes(SCOPES)
+        default_project = bq_credentials.project_id
+    elif credentials_user_info_json:
+        bq_credentials = credentials.Credentials.from_authorized_user_info(
+            json.loads(credentials_user_info_json))
     else:
-        credentials, default_project = google.auth.default(scopes=SCOPES)
+        bq_credentials, default_project = google.auth.default(scopes=SCOPES)
 
     if project_id is None:
         project_id = default_project
@@ -63,7 +68,7 @@ def create_bigquery_client(
     return bigquery.Client(
         client_info=google_client_info(),
         project=project_id,
-        credentials=credentials,
+        credentials=bq_credentials,
         location=location,
         default_query_job_config=default_query_job_config,
     )

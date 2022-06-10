@@ -761,6 +761,7 @@ class BigQueryDialect(DefaultDialect):
         credentials_info=None,
         credentials_base64=None,
         list_tables_page_size=1000,
+        credentials_user_info_json=None,
         *args,
         **kwargs,
     ):
@@ -772,6 +773,7 @@ class BigQueryDialect(DefaultDialect):
         self.location = location
         self.dataset_id = None
         self.list_tables_page_size = list_tables_page_size
+        self.credentials_user_info_json = credentials_user_info_json
 
     @classmethod
     def dbapi(cls):
@@ -802,6 +804,7 @@ class BigQueryDialect(DefaultDialect):
             credentials_base64,
             default_query_job_config,
             list_tables_page_size,
+            credentials_user_info_json,
         ) = parse_url(url)
 
         self.arraysize = arraysize or self.arraysize
@@ -809,6 +812,7 @@ class BigQueryDialect(DefaultDialect):
         self.location = location or self.location
         self.credentials_path = credentials_path or self.credentials_path
         self.credentials_base64 = credentials_base64 or self.credentials_base64
+        self.credentials_user_info_json = credentials_user_info_json or self.credentials_user_info_json
         self.dataset_id = dataset_id
         self._add_default_dataset_to_job_config(
             default_query_job_config, project_id, dataset_id
@@ -817,6 +821,7 @@ class BigQueryDialect(DefaultDialect):
             credentials_path=self.credentials_path,
             credentials_info=self.credentials_info,
             credentials_base64=self.credentials_base64,
+            credentials_user_info_json=self.credentials_user_info_json,
             project_id=project_id,
             location=self.location,
             default_query_job_config=default_query_job_config,
